@@ -1,0 +1,69 @@
+      
+# config.yaml
+
+llm_settings:
+  # --- Model Selection ---
+  # Choose models you have downloaded with Ollama (e.g., ollama pull llama3:8b)
+  # You can use the same model for multiple roles, or different ones.
+  # Llama 3 8B is a good general-purpose choice if available.
+  # Mistral 7B is also a strong option.
+  author_model: "llama3:8b"          # For planning review and final approval
+  planning_model: "llama3:8b"        # For initial novel synopsis and chapter goal generation
+  summarizer_model: "mistral:7b"     # For summarizing previous chapters (can be a smaller model)
+  beat_planner_model: "llama3:8b"    # For generating chapter beat sheets
+  drafter_model: "llama3:8b"         # For writing the main chapter draft (often the most capable model)
+  editor_model: "mistral:7b"         # For providing editorial feedback
+  writer_model: "llama3:8b"          # For refining drafts based on feedback
+  consistency_model: "mistral:7b"    # For consistency checks
+  char_gen_model: "llama3:8b"        # For enhancing character details
+
+  # --- Temperature Settings ---
+  # Controls randomness: 0.0 = deterministic, >1.0 = more random/creative
+  temperature:
+    author: 0.6
+    planning: 0.7
+    summarizer: 0.3
+    beat_planner: 0.6
+    drafter: 0.8
+    editor: 0.4
+    writer: 0.7
+    consistency: 0.3
+    char_gen: 0.7
+
+workflow_settings:
+  output_directory: "novel_output"    # Directory where everything will be saved
+  output_format: "md"                 # "txt" or "md" (markdown)
+  checkpoint_db: "novel_checkpoint.sqlite" # SQLite file for saving progress
+  max_llm_retries: 2                  # Number of retries if an LLM call fails
+  max_revisions_per_chapter: 3        # How many times a chapter can go through draft-edit-refine-review
+  max_chapters_estimate: 25           # Estimated max chapters for recursion limit (can be conservative)
+
+vector_store_settings:
+  use_vector_store: true              # Set to true to enable, false to disable
+  embedding_model: "all-MiniLM-L6-v2" # SentenceTransformer model for embeddings
+  collection_name: "novel_context_v3" # Name for the ChromaDB collection
+  retrieved_context_chars: 2000       # Max characters of context for Drafter
+  retrieved_context_chars_consistency: 2500 # Max characters for Consistency Checker
+
+rewrite_settings:
+  enabled: true                             # Set to true to activate rewrite mode
+  input_novel_file: "original_novel.txt"  # Path to your existing novel
+  # How chapters are delimited in your input file.
+  # Common examples: "\n## Chapter ", "\n# Chapter ", "\nChapter "
+  # If your novel is one giant block, you might need a pre-processing step or a different strategy.
+  chapter_delimiter: "\n## Chapter "
+  # CRUCIAL: Your specific instructions on HOW to improve the novel.
+  # Be as detailed as possible. This will be fed to the rewriter.
+  overall_improvement_focus: |
+    - Enhance the depth of the main protagonist, Seraphina, by showing more of her internal thoughts and motivations.
+    - Increase the pacing during action sequences by using shorter sentences and more active verbs.
+    - Add more vivid sensory details to all scenes to improve immersion.
+    - Ensure dialogue is sharp and reveals character, avoiding exposition dumps.
+    - Strengthen the foreshadowing for the final twist.
+    - Maintain the core plot points and character arcs from the original.
+    - Improve prose quality, clarity, and flow throughout.
+  # Optional: If you want to change general parameters for the rewritten version
+  # target_genre_override: "Dark Fantasy" # If you want to shift genre
+  # target_tone_override: "Grim and Ominous"  # If you want to shift tone
+
+    

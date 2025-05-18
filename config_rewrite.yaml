@@ -1,0 +1,46 @@
+# config_rewrite.yaml
+
+llm_settings:
+  author_model: "llama3:8b"
+  drafter_model: "llama3:8b"  # This is your "Rewriter"
+  editor_model: "mistral:7b"
+  writer_model: "llama3:8b"   # This is your "Refiner"
+  summarizer_model: "mistral:7b"
+  temperature: # Optional, defaults can be set in script if not here
+    author: 0.5
+    drafter: 0.7 # Rewriter temp
+    editor: 0.3
+    writer: 0.6  # Refiner temp
+    summarizer: 0.2
+
+workflow_settings:
+  output_directory: "novel_output_rewrite"
+  checkpoint_db: "rewrite_checkpoint.sqlite"
+  max_llm_retries: 2
+  max_revisions_per_chapter: 2 # How many times a single chapter can be re-rewritten after author feedback
+  recursion_limit: 1000 # Adjust based on num_chapters * max_revisions_per_chapter * ~5 nodes_per_loop
+
+rewrite_settings:
+  input_novel_file: "original_novel.txt"  # IMPORTANT: Set path to your novel
+  # Common chapter delimiters (use a regex pattern if complex, or a simple string)
+  # Simple string example (matches "## Chapter " followed by number/roman numeral)
+  chapter_delimiter: "## Chapter " 
+  estimated_number_of_chapters: 13 # << ADD THIS LINE (adjust to your novel's approx length)
+  overall_improvement_focus: |
+    - Enhance character depth by showing more internal thoughts, motivations, and subtle emotional cues rather than stating feelings directly.
+    - Improve pacing: Tighten action sequences with shorter sentences and stronger verbs; allow more reflective moments where appropriate for emotional impact.
+    - Increase sensory details: Weave in more sight, sound, smell, touch, and taste descriptions to make scenes more immersive.
+    - Strengthen dialogue: Ensure dialogue reveals character, advances plot, or contains subtext. Reduce purely expositional dialogue.
+    - Check for and resolve any minor plot inconsistencies or awkward phrasing from the original.
+    - Elevate overall prose quality, focusing on varied sentence structure, vivid imagery, and precise word choice.
+    - Maintain the core plot points, character arcs, and essential tone of the original text unless specific deviations are requested for a particular section.
+
+  # Optional: If you want to shift genre/tone for the entire rewrite
+  # target_genre_override: "Dark Fantasy"
+  # target_tone_override: "More ominous and suspenseful"
+
+vector_store_settings:
+  use_vector_store: true
+  embedding_model: "all-MiniLM-L6-v2"
+  collection_name: "rewritten_novel_chaps_v1"
+  retrieved_context_chars: 2500
